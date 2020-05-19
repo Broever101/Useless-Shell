@@ -1,6 +1,6 @@
 # GBS Shell Makefile
 
-CC = gcc
+CC = g++
 CFLAGS  = -Wall -g
 OBJ = gbsh.o
 
@@ -9,5 +9,5 @@ all: gbsh
 gbsh: $(OBJ)
 	$(CC) $(CFLAGS) -o gbsh $(OBJ)
 
-%.o: %.c
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $<
