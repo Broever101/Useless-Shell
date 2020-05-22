@@ -10,4 +10,4 @@ gbsh: $(OBJ)
 	$(CC) $(CFLAGS) -o gbsh $(OBJ)
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) -std=c++17 $(CFLAGS) -c $<
