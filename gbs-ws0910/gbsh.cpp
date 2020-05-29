@@ -61,11 +61,41 @@ void clear()
 	std::cout << "\e[1;1H\e[2J" << '\n';
 }
 
-std::vector<std::string> tokenize(std::string command)
+strVec envr()
+{
+	char **env = environ;
+	strVec envs;
+	for (std::size_t i = 0; env[i] != NULL; ++i)
+		envs.push_back(env[i]);
+	return envs;
+}
+
+void set_env(strVec &commands)
+{
+	commands.push_back("");
+	if (getenv(commands[1].c_str()) != NULL)
+		std::cout << "Variable already defined. Updating.\n";
+	setenv(commands[1].c_str(), commands[2].c_str(), 1);
+	perror("");
+}
+
+void unset_env(strVec &commands)
+{
+	commands.push_back("");
+	if (getenv(commands[1].c_str()) == NULL)
+		std::cout << "Variable already undefined.\n";
+	else
+	{
+		unsetenv(commands[1].c_str());
+		perror("");
+	}
+}
+
+strVec tokenize(std::string command)
 {
 	std::stringstream cmd_line(command);
 	std::string token;
-	std::vector<std::string> tokens;
+	strVec tokens;
 	while (cmd_line >> token)
 	{
 		tokens.push_back(token);
@@ -77,6 +107,7 @@ int main(int argc, char *argv[])
 {
 	std::string prompt = getPrompt();
 	std::string command;
+	setenv("SHELL", getpwd().c_str(), 1);
 	while (true)
 	{
 		std::cout << prompt;
@@ -102,6 +133,22 @@ int main(int argc, char *argv[])
 		else if (commands[0] == "cd")
 		{
 			cd(prompt, commands);
+		}
+		else if (commands[0] == "environ")
+		{
+			strVec env = envr();
+			for (auto i : env)
+			{
+				std::cout << i << std::endl;
+			}
+		}
+		else if (commands[0] == "setenv")
+		{
+			set_env(commands);
+		}
+		else if (commands[0] == "unsetenv")
+		{
+			unset_env(commands);
 		}
 		else
 		{
