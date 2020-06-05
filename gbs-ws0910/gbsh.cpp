@@ -5,12 +5,19 @@
 #include <string.h>
 #include <iostream>
 #include <vector>
+#include <deque>
+#include <algorithm>
 #include <errno.h>
+#include <sys/wait.h>
 #include <filesystem>
+#include <fcntl.h>
 #include <sstream>
 
-typedef std::vector<std::string> strVec;
+typedef std::deque<std::string> strVec;
 namespace fs = std::filesystem;
+
+static const int READ_END = 0;
+static const int WRITE_END = 1;
 
 std::string getPrompt()
 {
@@ -103,6 +110,27 @@ strVec tokenize(std::string command)
 	return tokens;
 }
 
+void exec_with_args(strVec& commands){
+	auto program = commands.front();
+	
+	auto env_val = getpwd() + "/gbsh";
+	setenv("parent", env_val.c_str(), 1);
+
+	char* args[commands.size() + 1];
+	for (size_t i = 0; i < commands.size(); i++){
+		args[i] = new char[commands[i].length() + 1];
+		strcpy(args[i], commands[i].c_str());
+	}
+	args[commands.size()] = NULL;
+	int status = 0;
+	if (!fork()){
+		execvp(program.c_str(), args);
+	}
+	else {
+		wait(&status);
+	}	
+}
+
 int main(int argc, char *argv[])
 {
 	std::string prompt = getPrompt();
@@ -152,8 +180,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			for (auto i : commands)
-				std::cout << i << std::endl;
+			exec_with_args(commands);
 		}
 	}
 
