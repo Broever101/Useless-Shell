@@ -7,7 +7,7 @@ OBJ = gbsh.o
 all: gbsh
 
 gbsh: $(OBJ)
-	$(CC) $(CFLAGS) -o gbsh $(OBJ)
+	$(CC) $(CFLAGS) -o gbsh utils.cpp $(OBJ)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c $<
